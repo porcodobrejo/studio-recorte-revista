@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#020617">
+  <meta name="description" content="Gerador de letras estilo recorte de revista para cartolinas, com folhas A4 prontas para imprimir e recortar.">
+  <title>Studio Recorte de Revista • Gerador de Letras para Cartolina</title>
+
+  <!-- Fontes do Google Fonts (Manchete, Vintage, Datilografia e Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Bebas+Neue&family=Cinzel:wght@900&family=Courier+Prime:ital,wght@0,700;1,700&family=DM+Serif+Display:ital@0;1&family=Montserrat:ital,wght@1,900&family=Oswald:wght@700&family=Playfair+Display:wght@900&family=Rubik+Mono+One&family=Rye&family=Special+Elite&family=Staatliches&family=Syne:wght@800&family=Ultra&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- ===================== TOPO ===================== -->
+  <header class="topbar">
+    <div class="brand" aria-label="Revista">
+      <span class="b b1">R</span><span class="b b2">E</span><span class="b b3">V</span><span class="b b4">I</span><span class="b b5">S</span><span class="b b6">T</span><span class="b b7">A</span>
+      <div class="brand-text">
+        <strong>STUDIO RECORTE DE REVISTA</strong>
+        <small>Letras para cartolina • Escala real 1:1 em folhas A4</small>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="btn-reroll" class="btn btn-ghost btn-amber" title="Sortear novas fontes e cores mantendo o texto">
+        <svg viewBox="0 0 24 24"><path d="M4 4v5h.6m15.4 2A8 8 0 004.6 9m0 0H9m11 11v-5h-.6m0 0a8 8 0 01-15.4-2m15.4 2H15"/></svg>
+        <span class="lbl">Sortear</span>
+      </button>
+      <button id="btn-print" class="btn btn-ghost" title="Imprimir folhas A4">
+        <svg viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span class="lbl">Imprimir</span>
+      </button>
+      <button id="btn-pdf" class="btn btn-primary" title="Baixar PDF com as folhas A4">
+        <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span class="lbl">Baixar PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+
+    <!-- ===================== PAINEL DE CONTROLES ===================== -->
+    <aside class="panel" id="panel">
+
+      <!-- 1. Frase -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-indigo"></i>Frase do cartaz</h2>
+          <span id="char-count" class="pill">0 letras</span>
+        </div>
+        <textarea id="txt" rows="3" spellcheck="false" autocomplete="off" placeholder="Digite sua frase aqui..."></textarea>
+        <p class="hint">Use <b>Enter</b> para quebrar a linha. Toque em uma letra na cartolina para sortear só ela.</p>
+        <div class="chips scroll-x" id="phrase-chips"></div>
+      </section>
+
+      <!-- 2. Tema -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-rose"></i>Estilo dos recortes</h2>
+        </div>
+        <div class="grid2">
+          <button class="theme-btn" data-theme="mixed"><b>💥 Colagem Zine 90s</b><small>Mix colorido e contrastes fortes</small></button>
+          <button class="theme-btn" data-theme="newspaper"><b>🗞️ Jornal &amp; Vintage</b><small>Papel envelhecido e serifas</small></button>
+          <button class="theme-btn" data-theme="headline"><b>🚨 Manchete Tabloide</b><small>Preto, branco e vermelho vivo</small></button>
+          <button class="theme-btn" data-theme="typewriter"><b>⌨️ Datilografia &amp; Kraft</b><small>Máquina de escrever e papel pardo</small></button>
+        </div>
+        <button id="btn-reroll-2" class="btn btn-block btn-ghost btn-amber mt">🎲 Sortear novas combinações</button>
+      </section>
+
+      <!-- 3. Design das letras -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-emerald"></i>Design das letras</h2>
+        </div>
+
+        <span class="sub">Atalhos de visual</span>
+        <div class="seg" id="look-seg">
+          <button class="look-btn" data-look="clean">✨ Limpo</button>
+          <button class="look-btn" data-look="organic">🍂 Orgânico</button>
+          <button class="look-btn" data-look="chaos">🌀 Caótico</button>
+        </div>
+
+        <span class="sub">Caixinha / moldura interna</span>
+        <div class="frame-grid" id="frame-grid">
+          <button class="frame-btn" data-frame="none"><i class="fi fi-none"></i>Nenhuma</button>
+          <button class="frame-btn" data-frame="dotted"><i class="fi fi-dotted"></i>Pontilhada</button>
+          <button class="frame-btn" data-frame="dashed"><i class="fi fi-dashed"></i>Tracejada</button>
+          <button class="frame-btn" data-frame="solid"><i class="fi fi-solid"></i>Linha</button>
+          <button class="frame-btn" data-frame="double"><i class="fi fi-double"></i>Dupla</button>
+          <button class="frame-btn" data-frame="label"><i class="fi fi-label"></i>Etiqueta</button>
+          <button class="frame-btn" data-frame="mix"><i class="fi fi-mix"></i>Sortida</button>
+        </div>
+
+        <div class="opts">
+          <label class="opt">
+            <span><b>Letra tortinha</b><small>Inclina a letra (e a caixinha) dentro do recorte</small></span>
+            <input type="checkbox" class="switch" id="opt-tilt">
+          </label>
+          <div class="range" data-for="opt-tilt">
+            <span>Suave</span><input type="range" id="opt-tilt-amt" min="0" max="100"><span>Forte</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Papel amassado</b><small>Vincos e dobras como papel amassado</small></span>
+            <input type="checkbox" class="switch" id="opt-crumple">
+          </label>
+          <div class="range" data-for="opt-crumple">
+            <span>Leve</span><input type="range" id="opt-crumple-amt" min="0" max="100"><span>Muito</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Bordas rasgadas à mão</b><small>Bordinhas irregulares, sem corte seco</small></span>
+            <input type="checkbox" class="switch" id="opt-torn">
+          </label>
+          <div class="range" data-for="opt-torn">
+            <span>Sutil</span><input type="range" id="opt-torn-amt" min="0" max="100"><span>Rasgado</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Retícula de revista</b><small>Pontinhos de impressão gráfica</small></span>
+            <input type="checkbox" class="switch" id="opt-halftone">
+          </label>
+          <label class="opt">
+            <span><b>Recortes tortos na cartolina</b><small>Rotação artística de −4° a +4°</small></span>
+            <input type="checkbox" class="switch" id="opt-rotation">
+          </label>
+          <label class="opt">
+            <span><b>Fita adesiva</b><small>Apenas na simulação da cartolina</small></span>
+            <input type="checkbox" class="switch" id="opt-tape">
+          </label>
+          <label class="opt">
+            <span><b>Linhas tracejadas de corte</b><small>Guia para tesoura ou estilete</small></span>
+            <input type="checkbox" class="switch" id="opt-guides">
+          </label>
+        </div>
+      </section>
+
+      <!-- 4. Cartolina -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-sky"></i>Medidas da cartolina</h2>
+        </div>
+        <div class="grid3" id="poster-presets">
+          <button class="poster-btn" data-w="50" data-h="66"><b>50 × 66</b><small>Padrão</small></button>
+          <button class="poster-btn" data-w="100" data-h="70"><b>100 × 70</b><small>Média</small></button>
+          <button class="poster-btn" data-w="150" data-h="100"><b>150 × 100</b><small>Grande</small></button>
+        </div>
+        <div class="grid3 mt">
+          <label class="field"><span>Largura (cm)</span><input type="number" inputmode="decimal" id="in-poster-w" min="15" max="600"></label>
+          <label class="field"><span>Altura (cm)</span><input type="number" inputmode="decimal" id="in-poster-h" min="15" max="600"></label>
+          <label class="field"><span>Cor</span><input type="color" id="in-poster-color"></label>
+        </div>
+
+        <div class="divider"></div>
+        <div class="card-head">
+          <span class="sub nomargin">Tamanho de cada recorte</span>
+          <div class="seg small">
+            <button id="mode-auto">Auto</button>
+            <button id="mode-manual">Manual</button>
+          </div>
+        </div>
+        <div id="auto-box" class="info">
+          <span>Cálculo proporcional (preenche a cartolina):</span>
+          <b id="auto-size">—</b>
+        </div>
+        <div id="manual-box" class="grid2 hidden">
+          <label class="field"><span>Largura (cm)</span><input type="number" inputmode="decimal" id="in-letter-w" step="0.5" min="1.5" max="18.6"></label>
+          <label class="field"><span>Altura (cm)</span><input type="number" inputmode="decimal" id="in-letter-h" step="0.5" min="1.5" max="26.4"></label>
+        </div>
+      </section>
+
+      <!-- 5. Referências -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-amber"></i>Cores das suas referências</h2>
+          <span id="ref-count" class="pill">0/10</span>
+        </div>
+        <p class="hint">Envie até 10 fotos ou prints que você gostou. O sistema extrai as cores e usa nos recortes.</p>
+        <input type="file" id="ref-input" accept="image/*" multiple hidden>
+        <label for="ref-input" class="drop">
+          <svg viewBox="0 0 24 24"><path d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2l1.6-1.6a2 2 0 012.8 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <b>Selecionar imagens</b>
+          <small>JPG, PNG, WebP ou capturas de tela</small>
+        </label>
+        <div id="ref-grid" class="ref-grid"></div>
+        <div id="palette-box" class="palette hidden">
+          <div id="swatches" class="swatches"></div>
+          <div class="grid2">
+            <button id="btn-apply-palette" class="btn btn-ghost btn-amber">Aplicar nos recortes</button>
+            <button id="btn-clear-palette" class="btn btn-ghost">Usar cores do tema</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="panel-foot">
+        <button id="btn-reset" class="btn btn-ghost">↺ Restaurar padrão</button>
+        <span>Suas configurações ficam salvas neste navegador.</span>
+      </footer>
+    </aside>
+
+    <!-- ===================== ÁREA DE VISUALIZAÇÃO ===================== -->
+    <main class="workspace" id="workspace">
+      <div class="ws-bar">
+        <div class="tabs">
+          <button id="tab-poster" class="tab active">Cartolina <span id="tab-poster-dim" class="muted"></span></button>
+          <button id="tab-a4" class="tab">Folhas A4 <span id="tab-a4-count" class="muted"></span></button>
+        </div>
+        <div class="zoom">
+          <button id="zoom-out" title="Diminuir zoom" aria-label="Diminuir zoom">−</button>
+          <button id="zoom-fit" title="Ajustar à tela"><span id="zoom-label">100%</span></button>
+          <button id="zoom-in" title="Aumentar zoom" aria-label="Aumentar zoom">+</button>
+          <button id="btn-expand" class="only-mobile" title="Expandir visualização" aria-label="Expandir visualização">⤢</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <span>Cartolina <b id="st-poster">—</b></span>
+        <span>Letra <b id="st-letter">—</b></span>
+        <span><b id="st-count">0</b> letras • <b id="st-pages">0</b> folhas A4</span>
+        <span id="fit-warning" class="warn hidden">⚠ A frase não cabe — diminua a letra</span>
+      </div>
+
+      <div class="stage" id="stage">
+        <div id="poster-wrap" class="poster-wrap">
+          <canvas id="poster-canvas" aria-label="Simulação da cartolina"></canvas>
+        </div>
+        <div id="a4-wrap" class="a4-wrap hidden">
+          <p class="muted center small">Folha A4 (21 × 29,7 cm) • Imprima em escala 100% / tamanho real</p>
+          <div id="a4-pages" class="a4-pages"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="print-area" aria-hidden="true"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/render.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
