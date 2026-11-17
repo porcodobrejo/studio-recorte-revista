@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#020617">
+  <meta name="description" content="Gerador de letras estilo recorte de revista para cartolinas, com folhas A4 prontas para imprimir e recortar.">
+  <title>Studio Recorte de Revista • Gerador de Letras para Cartolina</title>
+
+  <!-- Fontes do Google Fonts (Manchete, Vintage, Datilografia e Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Anton&family=Bebas+Neue&family=Cinzel:wght@900&family=Courier+Prime:ital,wght@0,700;1,700&family=DM+Serif+Display:ital@0;1&family=Montserrat:ital,wght@1,900&family=Oswald:wght@700&family=Playfair+Display:wght@900&family=Rubik+Mono+One&family=Rye&family=Special+Elite&family=Staatliches&family=Syne:wght@800&family=Ultra&display=swap" rel="stylesheet">
+
+  <style>
+/* =============================================================================
+   Studio Recorte de Revista — Estilos da interface
+   CSS puro (sem framework) para carregar rápido e rodar leve no celular.
+   ========================================================================== */
+:root {
+  --bg: #0b1120;
+  --panel: #020617;
+  --card: #0f172a;
+  --line: #1e293b;
+  --line2: #334155;
+  --txt: #e2e8f0;
+  --muted: #94a3b8;
+  --dim: #64748b;
+  --indigo: #6366f1;
+  --indigo-d: #4f46e5;
+  --amber: #fbbf24;
+  --emerald: #10b981;
+  --rose: #f43f5e;
+  --sky: #38bdf8;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--txt);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; border: 0; background: none; }
+.hidden { display: none !important; }
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.small { font-size: 12px; }
+.mt { margin-top: 10px; }
+
+/* ---------- Topo ---------- */
+.topbar {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 16px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 3px; user-select: none; min-width: 0; }
+.brand .b {
+  display: inline-block; padding: 1px 6px; border-radius: 4px; font-weight: 900; font-size: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.4);
+}
+.b1 { background: #fbbf24; color: #020617; transform: rotate(-3deg); font-family: Georgia, serif; }
+.b2 { background: #e11d48; color: #fff; transform: rotate(2deg); }
+.b3 { background: #10b981; color: #020617; transform: rotate(-2deg); font-family: monospace; }
+.b4 { background: #fff; color: #0f172a; transform: rotate(3deg); }
+.b5 { background: #4f46e5; color: #fff; transform: rotate(-1deg); }
+.b6 { background: #fde047; color: #0f172a; transform: rotate(2deg); }
+.b7 { background: #f97316; color: #fff; transform: rotate(-3deg); }
+.brand-text { display: flex; flex-direction: column; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--line); }
+.brand-text strong { font-size: 12px; letter-spacing: .04em; }
+.brand-text small { font-size: 11px; color: var(--muted); }
+.top-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 14px; border-radius: 12px; font-size: 13px; font-weight: 700;
+  transition: background .15s, transform .1s, border-color .15s;
+}
+.btn:active { transform: scale(.97); }
+.btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-ghost { background: #1e293b; border: 1px solid var(--line2); }
+.btn-ghost:hover { background: #273449; }
+.btn-amber { color: #fcd34d; border-color: rgba(251,191,36,.35); }
+.btn-primary { background: linear-gradient(90deg, #059669, #0d9488); color: #fff; box-shadow: 0 6px 16px rgba(5,150,105,.25); }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-block { width: 100%; }
+.btn[disabled] { opacity: .6; pointer-events: none; }
+
+/* ---------- Layout principal ---------- */
+.app {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: 410px minmax(0, 1fr);
+}
+.panel {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 16px; display: flex; flex-direction: column; gap: 14px;
+}
+.workspace { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #0f172a; }
+
+/* ---------- Cards do painel ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.card h2 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; display: flex; align-items: center; gap: 7px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-indigo { background: var(--indigo); } .dot-rose { background: var(--rose); } .dot-emerald { background: var(--emerald); }
+.dot-sky { background: var(--sky); } .dot-amber { background: var(--amber); }
+.pill { font-size: 11px; font-family: ui-monospace, monospace; background: #1e293b; color: var(--muted); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.hint { margin: 8px 0; font-size: 12px; color: var(--muted); }
+.sub { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 4px 0 8px; }
+.sub.nomargin { margin: 0; }
+.divider { height: 1px; background: var(--line); margin: 14px 0 12px; }
+
+textarea {
+  width: 100%; resize: vertical; min-height: 76px;
+  background: var(--panel); border: 1px solid var(--line2); border-radius: 12px;
+  padding: 10px 12px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  outline: none;
+}
+textarea:focus, .field input:focus { border-color: var(--indigo); box-shadow: 0 0 0 2px rgba(99,102,241,.25); }
+
+.chips { display: flex; gap: 6px; }
+.scroll-x { overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.chip { flex-shrink: 0; font-size: 12px; padding: 5px 10px; border-radius: 99px; background: #1e293b; border: 1px solid var(--line2); color: #cbd5e1; white-space: nowrap; }
+.chip:hover { border-color: var(--indigo); }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+.theme-btn, .poster-btn {
+  text-align: left; padding: 10px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 2px; transition: border-color .15s, background .15s;
+}
+.theme-btn b, .poster-btn b { font-size: 12.5px; }
+.theme-btn small, .poster-btn small { font-size: 11px; color: var(--dim); }
+.poster-btn { text-align: center; align-items: center; }
+.theme-btn.active, .poster-btn.active { border-color: var(--indigo); background: rgba(79,70,229,.15); }
+.theme-btn.active b, .poster-btn.active b { color: #a5b4fc; }
+
+/* Segmentado */
+.seg { display: flex; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 12px; }
+.seg button { flex: 1; padding: 8px 6px; border-radius: 9px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.seg button.active { background: var(--indigo-d); color: #fff; }
+.seg.small { margin: 0; }
+.seg.small button { padding: 4px 12px; font-size: 11.5px; flex: none; }
+
+/* Molduras */
+.frame-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.frame-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 2px; font-size: 11px; color: #cbd5e1;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+}
+.frame-btn.active { border-color: var(--emerald); background: rgba(16,185,129,.12); color: #6ee7b7; }
+.fi { width: 26px; height: 30px; border-radius: 3px; background: #fef08a; position: relative; display: block; }
+.fi::after { content: ''; position: absolute; inset: 4px; border: 2px solid #18181b; }
+.fi-none::after { display: none; }
+.fi-dotted::after { border-style: dotted; }
+.fi-dashed::after { border-style: dashed; }
+.fi-double::after { border: 4px double #18181b; }
+.fi-label::after { background: #18181b; border-radius: 3px; }
+.fi-mix { background: linear-gradient(135deg, #fef08a 50%, #f43f5e 50%); }
+.fi-mix::after { border-style: dotted; transform: rotate(-6deg); }
+
+/* Opções (switches) */
+.opts { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.opt { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(30,41,59,.6); cursor: pointer; }
+.opt b { display: block; font-size: 13px; font-weight: 600; }
+.opt small { display: block; font-size: 11.5px; color: var(--dim); }
+.switch {
+  appearance: none; -webkit-appearance: none; flex-shrink: 0;
+  width: 42px; height: 24px; border-radius: 99px; background: #334155; position: relative; cursor: pointer;
+  transition: background .2s; margin: 0;
+}
+.switch::after {
+  content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.switch:checked { background: var(--emerald); }
+.switch:checked::after { transform: translateX(18px); }
+.range { display: flex; align-items: center; gap: 10px; padding: 2px 0 10px; font-size: 11px; color: var(--dim); }
+.range input { flex: 1; accent-color: var(--emerald); height: 24px; }
+
+/* Campos */
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); }
+.field input {
+  width: 100%; min-width: 0; background: var(--panel); border: 1px solid var(--line2); border-radius: 10px;
+  padding: 8px; font-size: 16px; font-weight: 700; text-align: center; outline: none;
+}
+.field input[type=color] { padding: 3px; height: 40px; cursor: pointer; }
+.info { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(49,46,129,.3); border: 1px solid rgba(99,102,241,.3); border-radius: 12px; padding: 10px; font-size: 12px; color: #a5b4fc; }
+.info b { font-family: ui-monospace, monospace; color: #e0e7ff; white-space: nowrap; }
+
+/* Referências */
+.drop {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px; cursor: pointer; text-align: center;
+  border: 2px dashed var(--line2); border-radius: 12px; background: rgba(2,6,23,.6); transition: border-color .15s;
+}
+.drop:hover { border-color: var(--amber); }
+.drop svg { width: 26px; height: 26px; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; }
+.drop b { font-size: 13px; } .drop small { font-size: 11px; color: var(--dim); }
+.ref-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+.ref-grid:empty { display: none; }
+.ref-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--line2); }
+.ref-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ref-thumb button {
+  position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 6px;
+  background: #e11d48; color: #fff; font-size: 13px; line-height: 22px; opacity: 0; transition: opacity .15s;
+}
+.ref-thumb:hover button { opacity: 1; }
+@media (hover: none) { .ref-thumb button { opacity: 1; } }
+.palette { margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.swatches { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; }
+.swatches i { width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0; border: 1px solid var(--line2); }
+.palette .btn { font-size: 12px; padding: 8px; }
+
+.panel-foot { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 0 20px; font-size: 11px; color: var(--dim); }
+
+/* ---------- Área de visualização ---------- */
+.ws-bar {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 14px; background: rgba(2,6,23,.85); border-bottom: 1px solid var(--line);
+}
+.tabs { display: flex; gap: 4px; min-width: 0; }
+.tab { padding: 7px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.tab .muted { font-weight: 400; font-size: 11.5px; }
+.tab.active { background: var(--indigo-d); color: #fff; }
+.tab.active .muted { color: #c7d2fe; }
+.zoom { display: flex; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 2px; flex-shrink: 0; }
+.zoom button { min-width: 32px; height: 30px; border-radius: 8px; font-size: 16px; font-weight: 700; color: var(--muted); }
+.zoom button:hover { color: #fff; background: #1e293b; }
+#zoom-fit { font-size: 11px; font-family: ui-monospace, monospace; min-width: 52px; }
+.only-mobile { display: none; }
+
+.stats {
+  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 6px 14px; font-size: 11.5px; color: var(--muted);
+  border-bottom: 1px solid var(--line); background: rgba(2,6,23,.5);
+}
+.stats b { color: #e2e8f0; }
+.warn { color: #fbbf24; font-weight: 600; }
+
+.stage { flex: 1; min-height: 0; overflow: auto; padding: 24px; -webkit-overflow-scrolling: touch; }
+.poster-wrap { display: flex; justify-content: center; min-width: min-content; }
+#poster-canvas {
+  display: block; border-radius: 3px; cursor: pointer;
+  box-shadow: 0 0 0 6px rgba(41,37,36,.55), 0 25px 50px -12px rgba(0,0,0,.7);
+  touch-action: manipulation;
+}
+.a4-wrap { display: flex; flex-direction: column; align-items: center; min-width: min-content; }
+.a4-pages { display: flex; flex-direction: column; align-items: center; gap: 24px; padding-bottom: 30px; }
+.a4-pages canvas { display: block; background: #fff; border-radius: 4px; box-shadow: 0 15px 35px rgba(0,0,0,.5); }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 30px);
+  background: #1e293b; border: 1px solid var(--line2); color: #fff; padding: 10px 16px; border-radius: 12px;
+  font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 50; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Barra de rolagem (desktop) */
+@media (hover: hover) {
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+}
+
+/* ---------- Tablet / Celular ---------- */
+@media (max-width: 1100px) {
+  .brand-text small { display: none; }
+}
+@media (max-width: 900px) {
+  .brand-text { display: none; }
+  .brand .b { font-size: 15px; padding: 1px 5px; }
+  .top-actions .btn { padding: 9px 11px; }
+  .top-actions .btn-ghost .lbl { display: none; }
+
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 44%) minmax(0, 1fr);
+  }
+  .workspace { order: -1; border-bottom: 1px solid var(--line2); }
+  .panel { border-right: 0; padding: 12px; gap: 12px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .app.expanded { grid-template-rows: minmax(0, 1fr) 0; }
+  .app.expanded .panel { display: none; }
+  .only-mobile { display: inline-block; }
+  .stage { padding: 14px; }
+  .ws-bar { padding: 6px 8px; }
+  .tab { padding: 6px 9px; }
+  .tab .muted { display: none; }
+  .stats { padding: 5px 10px; gap: 2px 12px; font-size: 11px; }
+  #poster-canvas { box-shadow: 0 0 0 4px rgba(41,37,36,.55), 0 12px 24px rgba(0,0,0,.5); }
+}
+@media (max-width: 420px) {
+  .top-actions .btn-primary .lbl { display: none; }
+  .frame-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---------- Impressão nativa (Ctrl+P / botão Imprimir) ---------- */
+#print-area { display: none; }
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: #fff; display: block; }
+  body > *:not(#print-area) { display: none !important; }
+  #print-area { display: block !important; }
+  #print-area img { display: block; width: 210mm; height: 297mm; page-break-after: always; break-after: page; }
+  #print-area img:last-child { page-break-after: auto; break-after: auto; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- ===================== TOPO ===================== -->
+  <header class="topbar">
+    <div class="brand" aria-label="Revista">
+      <span class="b b1">R</span><span class="b b2">E</span><span class="b b3">V</span><span class="b b4">I</span><span class="b b5">S</span><span class="b b6">T</span><span class="b b7">A</span>
+      <div class="brand-text">
+        <strong>STUDIO RECORTE DE REVISTA</strong>
+        <small>Letras para cartolina • Escala real 1:1 em folhas A4</small>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="btn-reroll" class="btn btn-ghost btn-amber" title="Sortear novas fontes e cores mantendo o texto">
+        <svg viewBox="0 0 24 24"><path d="M4 4v5h.6m15.4 2A8 8 0 004.6 9m0 0H9m11 11v-5h-.6m0 0a8 8 0 01-15.4-2m15.4 2H15"/></svg>
+        <span class="lbl">Sortear</span>
+      </button>
+      <button id="btn-print" class="btn btn-ghost" title="Imprimir folhas A4">
+        <svg viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span class="lbl">Imprimir</span>
+      </button>
+      <button id="btn-pdf" class="btn btn-primary" title="Baixar PDF com as folhas A4">
+        <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span class="lbl">Baixar PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+
+    <!-- ===================== PAINEL DE CONTROLES ===================== -->
+    <aside class="panel" id="panel">
+
+      <!-- 1. Frase -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-indigo"></i>Frase do cartaz</h2>
+          <span id="char-count" class="pill">0 letras</span>
+        </div>
+        <textarea id="txt" rows="3" spellcheck="false" autocomplete="off" placeholder="Digite sua frase aqui..."></textarea>
+        <p class="hint">Use <b>Enter</b> para quebrar a linha. Toque em uma letra na cartolina para sortear só ela.</p>
+        <div class="chips scroll-x" id="phrase-chips"></div>
+      </section>
+
+      <!-- 2. Tema -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-rose"></i>Estilo dos recortes</h2>
+        </div>
+        <div class="grid2">
+          <button class="theme-btn" data-theme="mixed"><b>💥 Colagem Zine 90s</b><small>Mix colorido e contrastes fortes</small></button>
+          <button class="theme-btn" data-theme="newspaper"><b>🗞️ Jornal &amp; Vintage</b><small>Papel envelhecido e serifas</small></button>
+          <button class="theme-btn" data-theme="headline"><b>🚨 Manchete Tabloide</b><small>Preto, branco e vermelho vivo</small></button>
+          <button class="theme-btn" data-theme="typewriter"><b>⌨️ Datilografia &amp; Kraft</b><small>Máquina de escrever e papel pardo</small></button>
+        </div>
+        <button id="btn-reroll-2" class="btn btn-block btn-ghost btn-amber mt">🎲 Sortear novas combinações</button>
+      </section>
+
+      <!-- 3. Design das letras -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-emerald"></i>Design das letras</h2>
+        </div>
+
+        <span class="sub">Atalhos de visual</span>
+        <div class="seg" id="look-seg">
+          <button class="look-btn" data-look="clean">✨ Limpo</button>
+          <button class="look-btn" data-look="organic">🍂 Orgânico</button>
+          <button class="look-btn" data-look="chaos">🌀 Caótico</button>
+        </div>
+
+        <span class="sub">Caixinha / moldura interna</span>
+        <div class="frame-grid" id="frame-grid">
+          <button class="frame-btn" data-frame="none"><i class="fi fi-none"></i>Nenhuma</button>
+          <button class="frame-btn" data-frame="dotted"><i class="fi fi-dotted"></i>Pontilhada</button>
+          <button class="frame-btn" data-frame="dashed"><i class="fi fi-dashed"></i>Tracejada</button>
+          <button class="frame-btn" data-frame="solid"><i class="fi fi-solid"></i>Linha</button>
+          <button class="frame-btn" data-frame="double"><i class="fi fi-double"></i>Dupla</button>
+          <button class="frame-btn" data-frame="label"><i class="fi fi-label"></i>Etiqueta</button>
+          <button class="frame-btn" data-frame="mix"><i class="fi fi-mix"></i>Sortida</button>
+        </div>
+
+        <div class="opts">
+          <label class="opt">
+            <span><b>Letra tortinha</b><small>Inclina a letra (e a caixinha) dentro do recorte</small></span>
+            <input type="checkbox" class="switch" id="opt-tilt">
+          </label>
+          <div class="range" data-for="opt-tilt">
+            <span>Suave</span><input type="range" id="opt-tilt-amt" min="0" max="100"><span>Forte</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Papel amassado</b><small>Vincos e dobras como papel amassado</small></span>
+            <input type="checkbox" class="switch" id="opt-crumple">
+          </label>
+          <div class="range" data-for="opt-crumple">
+            <span>Leve</span><input type="range" id="opt-crumple-amt" min="0" max="100"><span>Muito</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Bordas rasgadas à mão</b><small>Bordinhas irregulares, sem corte seco</small></span>
+            <input type="checkbox" class="switch" id="opt-torn">
+          </label>
+          <div class="range" data-for="opt-torn">
+            <span>Sutil</span><input type="range" id="opt-torn-amt" min="0" max="100"><span>Rasgado</span>
+          </div>
+
+          <label class="opt">
+            <span><b>Retícula de revista</b><small>Pontinhos de impressão gráfica</small></span>
+            <input type="checkbox" class="switch" id="opt-halftone">
+          </label>
+          <label class="opt">
+            <span><b>Recortes tortos na cartolina</b><small>Rotação artística de −4° a +4°</small></span>
+            <input type="checkbox" class="switch" id="opt-rotation">
+          </label>
+          <label class="opt">
+            <span><b>Fita adesiva</b><small>Apenas na simulação da cartolina</small></span>
+            <input type="checkbox" class="switch" id="opt-tape">
+          </label>
+          <label class="opt">
+            <span><b>Linhas tracejadas de corte</b><small>Guia para tesoura ou estilete</small></span>
+            <input type="checkbox" class="switch" id="opt-guides">
+          </label>
+        </div>
+      </section>
+
+      <!-- 4. Cartolina -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-sky"></i>Medidas da cartolina</h2>
+        </div>
+        <div class="grid3" id="poster-presets">
+          <button class="poster-btn" data-w="50" data-h="66"><b>50 × 66</b><small>Padrão</small></button>
+          <button class="poster-btn" data-w="100" data-h="70"><b>100 × 70</b><small>Média</small></button>
+          <button class="poster-btn" data-w="150" data-h="100"><b>150 × 100</b><small>Grande</small></button>
+        </div>
+        <div class="grid3 mt">
+          <label class="field"><span>Largura (cm)</span><input type="number" inputmode="decimal" id="in-poster-w" min="15" max="600"></label>
+          <label class="field"><span>Altura (cm)</span><input type="number" inputmode="decimal" id="in-poster-h" min="15" max="600"></label>
+          <label class="field"><span>Cor</span><input type="color" id="in-poster-color"></label>
+        </div>
+
+        <div class="divider"></div>
+        <div class="card-head">
+          <span class="sub nomargin">Tamanho de cada recorte</span>
+          <div class="seg small">
+            <button id="mode-auto">Auto</button>
+            <button id="mode-manual">Manual</button>
+          </div>
+        </div>
+        <div id="auto-box" class="info">
+          <span>Cálculo proporcional (preenche a cartolina):</span>
+          <b id="auto-size">—</b>
+        </div>
+        <div id="manual-box" class="grid2 hidden">
+          <label class="field"><span>Largura (cm)</span><input type="number" inputmode="decimal" id="in-letter-w" step="0.5" min="1.5" max="18.6"></label>
+          <label class="field"><span>Altura (cm)</span><input type="number" inputmode="decimal" id="in-letter-h" step="0.5" min="1.5" max="26.4"></label>
+        </div>
+      </section>
+
+      <!-- 5. Referências -->
+      <section class="card">
+        <div class="card-head">
+          <h2><i class="dot dot-amber"></i>Cores das suas referências</h2>
+          <span id="ref-count" class="pill">0/10</span>
+        </div>
+        <p class="hint">Envie até 10 fotos ou prints que você gostou. O sistema extrai as cores e usa nos recortes.</p>
+        <input type="file" id="ref-input" accept="image/*" multiple hidden>
+        <label for="ref-input" class="drop">
+          <svg viewBox="0 0 24 24"><path d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2l1.6-1.6a2 2 0 012.8 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <b>Selecionar imagens</b>
+          <small>JPG, PNG, WebP ou capturas de tela</small>
+        </label>
+        <div id="ref-grid" class="ref-grid"></div>
+        <div id="palette-box" class="palette hidden">
+          <div id="swatches" class="swatches"></div>
+          <div class="grid2">
+            <button id="btn-apply-palette" class="btn btn-ghost btn-amber">Aplicar nos recortes</button>
+            <button id="btn-clear-palette" class="btn btn-ghost">Usar cores do tema</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="panel-foot">
+        <button id="btn-reset" class="btn btn-ghost">↺ Restaurar padrão</button>
+        <span>Suas configurações ficam salvas neste navegador.</span>
+      </footer>
+    </aside>
+
+    <!-- ===================== ÁREA DE VISUALIZAÇÃO ===================== -->
+    <main class="workspace" id="workspace">
+      <div class="ws-bar">
+        <div class="tabs">
+          <button id="tab-poster" class="tab active">Cartolina <span id="tab-poster-dim" class="muted"></span></button>
+          <button id="tab-a4" class="tab">Folhas A4 <span id="tab-a4-count" class="muted"></span></button>
+        </div>
+        <div class="zoom">
+          <button id="zoom-out" title="Diminuir zoom" aria-label="Diminuir zoom">−</button>
+          <button id="zoom-fit" title="Ajustar à tela"><span id="zoom-label">100%</span></button>
+          <button id="zoom-in" title="Aumentar zoom" aria-label="Aumentar zoom">+</button>
+          <button id="btn-expand" class="only-mobile" title="Expandir visualização" aria-label="Expandir visualização">⤢</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <span>Cartolina <b id="st-poster">—</b></span>
+        <span>Letra <b id="st-letter">—</b></span>
+        <span><b id="st-count">0</b> letras • <b id="st-pages">0</b> folhas A4</span>
+        <span id="fit-warning" class="warn hidden">⚠ A frase não cabe — diminua a letra</span>
+      </div>
+
+      <div class="stage" id="stage">
+        <div id="poster-wrap" class="poster-wrap">
+          <canvas id="poster-canvas" aria-label="Simulação da cartolina"></canvas>
+        </div>
+        <div id="a4-wrap" class="a4-wrap hidden">
+          <p class="muted center small">Folha A4 (21 × 29,7 cm) • Imprima em escala 100% / tamanho real</p>
+          <div id="a4-pages" class="a4-pages"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="print-area" aria-hidden="true"></div>
+
+  <script>
+/* =============================================================================
+   Studio Recorte de Revista — Dados estáticos (fontes, paletas, presets)
+   ========================================================================== */
+window.SR = window.SR || {};
+
+SR.FONTS = [
+  { name: "'Anton', sans-serif",            weight: '400', style: 'normal', category: 'headline' },
+  { name: "'Playfair Display', serif",      weight: '900', style: 'normal', category: 'vintage' },
+  { name: "'Special Elite', cursive",       weight: '400', style: 'normal', category: 'typewriter' },
+  { name: "'Bebas Neue', sans-serif",       weight: '400', style: 'normal', category: 'headline' },
+  { name: "'Alfa Slab One', serif",         weight: '400', style: 'normal', category: 'vintage' },
+  { name: "'Courier Prime', monospace",     weight: '700', style: 'normal', category: 'typewriter' },
+  { name: "'Cinzel', serif",                weight: '900', style: 'normal', category: 'vintage' },
+  { name: "'Oswald', sans-serif",           weight: '700', style: 'normal', category: 'headline' },
+  { name: "'Montserrat', sans-serif",       weight: '900', style: 'italic', category: 'headline' },
+  { name: "'DM Serif Display', serif",      weight: '400', style: 'italic', category: 'vintage' },
+  { name: "'Syne', sans-serif",             weight: '800', style: 'normal', category: 'headline' },
+  { name: "'Ultra', serif",                 weight: '400', style: 'normal', category: 'vintage' },
+  { name: "'Staatliches', sans-serif",      weight: '400', style: 'normal', category: 'headline' },
+  { name: "'Rye', serif",                   weight: '400', style: 'normal', category: 'vintage' },
+  { name: "'Rubik Mono One', sans-serif",   weight: '400', style: 'normal', category: 'typewriter' },
+  { name: "'Courier Prime', monospace",     weight: '700', style: 'italic', category: 'typewriter' }
+];
+
+SR.PALETTES = {
+  mixed: [
+    { bg: '#fef08a', text: '#09090b', border: '#ca8a04' },
+    { bg: '#18181b', text: '#ffffff', border: '#52525b' },
+    { bg: '#dc2626', text: '#ffffff', border: '#991b1b' },
+    { bg: '#ffffff', text: '#09090b', border: '#cbd5e1' },
+    { bg: '#e2d5c3', text: '#1c1917', border: '#a89f91' },
+    { bg: '#2563eb', text: '#ffffff', border: '#1d4ed8' },
+    { bg: '#f43f5e', text: '#ffffff', border: '#be123c' },
+    { bg: '#16a34a', text: '#ffffff', border: '#15803d' },
+    { bg: '#ea580c', text: '#ffffff', border: '#c2410c' },
+    { bg: '#fef3c7', text: '#451a03', border: '#d97706' }
+  ],
+  newspaper: [
+    { bg: '#fcf8ee', text: '#1c1917', border: '#d6c7b2' },
+    { bg: '#f5edd6', text: '#0f172a', border: '#cbbba0' },
+    { bg: '#292524', text: '#fcf8ee', border: '#44403c' },
+    { bg: '#e7dec8', text: '#1c1917', border: '#b8a88d' },
+    { bg: '#78350f', text: '#fef3c7', border: '#451a03' }
+  ],
+  headline: [
+    { bg: '#e11d48', text: '#ffffff', border: '#9f1239' },
+    { bg: '#09090b', text: '#ffffff', border: '#27272a' },
+    { bg: '#facc15', text: '#09090b', border: '#ca8a04' },
+    { bg: '#ffffff', text: '#e11d48', border: '#fda4af' },
+    { bg: '#1e1b4b', text: '#38bdf8', border: '#312e81' }
+  ],
+  typewriter: [
+    { bg: '#e2d5c3', text: '#1c1917', border: '#968875' },
+    { bg: '#f1f5f9', text: '#0f172a', border: '#94a3b8' },
+    { bg: '#ede0d4', text: '#382b22', border: '#a89382' },
+    { bg: '#e6ccb2', text: '#241a15', border: '#7f5539' }
+  ]
+};
+
+SR.PHRASES = [
+  'DEUS É TUDO QUE EU PRECISO',
+  'OS SONHOS NÃO MORREM',
+  'BEM-VINDOS',
+  'MUITO AMOR',
+  'FELIZ ANIVERSÁRIO'
+];
+
+SR.FRAME_KINDS = ['none', 'dotted', 'dashed', 'solid', 'double', 'label'];
+SR.FRAME_WEIGHTS = [2, 3, 2, 2, 2, 2];
+
+SR.LOOKS = {
+  clean:   { frame: 'none',   tilt: false, crumple: false, torn: false, halftone: true,  rotation: true },
+  organic: { frame: 'mix',    tilt: true,  tiltAmt: 0.45, crumple: true, crumpleAmt: 0.5, torn: true, tornAmt: 0.5, halftone: true, rotation: true },
+  chaos:   { frame: 'mix',    tilt: true,  tiltAmt: 0.9,  crumple: true, crumpleAmt: 0.85, torn: true, tornAmt: 0.9, halftone: true, rotation: true, tape: true }
+};
+
+SR.DEFAULTS = {
+  text: 'DEUS É TUDO QUE EU PRECISO',
+  posterW: 100,
+  posterH: 70,
+  posterColor: '#f4ebd0',
+  isAuto: true,
+  letterW: 7.2,
+  letterH: 9.5,
+  theme: 'mixed',
+  rotation: true,
+  guides: true,
+  tape: false,
+  halftone: true,
+  frame: 'none',
+  tilt: false,
+  tiltAmt: 0.5,
+  crumple: false,
+  crumpleAmt: 0.5,
+  torn: false,
+  tornAmt: 0.5,
+  extracted: [],
+  useExtracted: false,
+  seed: 12345
+};
+
+/* =============================================================================
+   Studio Recorte de Revista — Motor de desenho (Canvas 2D)
+   ========================================================================== */
+(function () {
+  'use strict';
+  const SR = window.SR;
+  const TAU = Math.PI * 2;
+  const DEG = Math.PI / 180;
+  const PAPER_CORE = '#fbf8f0';
+
+  function rng32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  let crumpleBig = null, crumpleSmall = null;
+  function buildCrumple() {
+    const S = 1024, N = 15, cell = S / (N - 1);
+    const c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const r = rng32(91373);
+    g.fillStyle = 'rgb(128,128,128)';
+    g.fillRect(0, 0, S, S);
+
+    const V = [];
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const edge = x === 0 || y === 0 || x === N - 1 || y === N - 1;
+        V.push({
+          x: x * cell + (edge ? 0 : (r() - 0.5) * cell * 0.8),
+          y: y * cell + (edge ? 0 : (r() - 0.5) * cell * 0.8),
+          z: r() * cell * 0.85
+        });
+      }
+    }
+    const L = (() => { const l = [-0.55, -0.65, 0.75]; const m = Math.hypot(...l); return l.map(v => v / m); })();
+    const baseLight = L[2];
+    function tri(a, b, d) {
+      const ux = b.x - a.x, uy = b.y - a.y, uz = b.z - a.z;
+      const vx = d.x - a.x, vy = d.y - a.y, vz = d.z - a.z;
+      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+      const m = Math.hypot(nx, ny, nz) || 1;
+      const s = (nx * L[0] + ny * L[1] + nz * L[2]) / m;
+      const v = Math.max(55, Math.min(205, Math.round(128 + (s - baseLight) * 230)));
+      const col = `rgb(${v},${v},${v})`;
+      g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 0.8;
+      g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.lineTo(d.x, d.y); g.closePath();
+      g.fill(); g.stroke();
+    }
+    for (let y = 0; y < N - 1; y++) {
+      for (let x = 0; x < N - 1; x++) {
+        const a = V[y * N + x], b = V[y * N + x + 1], d = V[(y + 1) * N + x], e = V[(y + 1) * N + x + 1];
+        if (r() < 0.5) { tri(a, b, e); tri(a, e, d); } else { tri(a, b, d); tri(b, e, d); }
+      }
+    }
+    for (let k = 0; k < 7; k++) {
+      let x = r() * S, y = r() * S, ang = r() * TAU;
+      const pts = [[x, y]];
+      for (let s = 0; s < 6; s++) {
+        ang += (r() - 0.5) * 0.6;
+        x += Math.cos(ang) * (60 + r() * 120); y += Math.sin(ang) * (60 + r() * 120);
+        pts.push([x, y]);
+      }
+      const stroke = (dx, dy, color, w) => {
+        g.strokeStyle = color; g.lineWidth = w; g.beginPath();
+        pts.forEach((p, i) => (i ? g.lineTo(p[0] + dx, p[1] + dy) : g.moveTo(p[0] + dx, p[1] + dy)));
+        g.stroke();
+      };
+      stroke(0, 0, 'rgba(0,0,0,0.30)', 1.6);
+      stroke(1.4, 1.4, 'rgba(255,255,255,0.28)', 1.4);
+    }
+    try {
+      const tmp = document.createElement('canvas'); tmp.width = tmp.height = S;
+      const tg = tmp.getContext('2d');
+      tg.filter = 'blur(1.6px)';
+      tg.drawImage(c, 0, 0);
+      if (tg.filter && tg.filter !== 'none') { g.clearRect(0, 0, S, S); g.drawImage(tmp, 0, 0); }
+    } catch (e) { /* ok */ }
+    const img = g.getImageData(0, 0, S, S), d = img.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const n = (r() - 0.5) * 22;
+      d[i] += n; d[i + 1] += n; d[i + 2] += n;
+    }
+    g.putImageData(img, 0, 0);
+
+    crumpleBig = c;
+    crumpleSmall = document.createElement('canvas');
+    crumpleSmall.width = crumpleSmall.height = 256;
+    crumpleSmall.getContext('2d').drawImage(c, 0, 0, 256, 256);
+  }
+  function getCrumple(sizePx) {
+    if (!crumpleBig) buildCrumple();
+    return sizePx < 420 ? crumpleSmall : crumpleBig;
+  }
+
+  const htCache = new Map();
+  function halftoneTile(s) {
+    s = Math.max(3, Math.round(s));
+    let c = htCache.get(s);
+    if (!c) {
+      c = document.createElement('canvas'); c.width = c.height = s;
+      const g = c.getContext('2d');
+      g.fillStyle = '#1e1e1e';
+      g.beginPath(); g.arc(s / 2, s / 2, Math.max(0.55, s * 0.14), 0, TAU); g.fill();
+      htCache.set(s, c);
+    }
+    return c;
+  }
+
+  function makeTear(r, W, H, base, amp, rough) {
+    const x0 = -W / 2 + base, y0 = -H / 2 + base, x1 = W / 2 - base, y1 = H / 2 - base;
+    const C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+    const N = [[0, 1], [-1, 0], [0, -1], [1, 0]];
+    const step = 0.12 + 0.08 * (1 - rough);
+    const outer = [], inner = [];
+    let maxD = 0;
+    for (let s = 0; s < 4; s++) {
+      const a = C[s], b = C[(s + 1) % 4], n = N[s], pn = N[(s + 3) % 4];
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const cnt = Math.max(5, Math.round(len / step));
+      const tx = (b[0] - a[0]) / len, ty = (b[1] - a[1]) / len;
+      const ph1 = r() * TAU, f1 = 0.6 + r() * 2.2, ph2 = r() * TAU, f2 = 3 + r() * 6;
+      for (let i = 0; i < cnt; i++) {
+        const t = i / cnt;
+        const wave = 0.5 + 0.3 * Math.sin(t * f1 * TAU + ph1) + 0.2 * Math.sin(t * f2 * TAU + ph2);
+        let d = amp * (0.2 + 0.45 * wave + 0.35 * r());
+        if (r() < 0.05) d += amp * 0.5 * r();
+        const j = i === 0 ? 0 : (r() - 0.5) * step * 0.6;
+        const px = a[0] + tx * (len * t + j), py = a[1] + ty * (len * t + j);
+        const fr = (0.025 + r() * 0.085) * (0.5 + rough);
+        let ox = px + n[0] * d, oy = py + n[1] * d;
+        let ix = px + n[0] * (d + fr), iy = py + n[1] * (d + fr);
+        if (i === 0) {
+          const d2 = amp * (0.3 + 0.5 * r());
+          ox += pn[0] * d2; oy += pn[1] * d2;
+          ix += pn[0] * (d2 + fr); iy += pn[1] * (d2 + fr);
+        }
+        outer.push([ox, oy]); inner.push([ix, iy]);
+        if (d + fr > maxD) maxD = d + fr;
+      }
+    }
+    return { outer, inner, depth: base + maxD };
+  }
+
+  function tracePath(ctx, pts, ppc) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0] * ppc, pts[0][1] * ppc);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0] * ppc, pts[i][1] * ppc);
+    ctx.closePath();
+  }
+
+  function roundRectPath(ctx, x, y, w, h, rad) {
+    rad = Math.min(rad, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
+  }
+
+  function drawFrame(ctx, kind, fw, fh, lw, color, ppc) {
+    const x = -fw / 2 * ppc, y = -fh / 2 * ppc, w = fw * ppc, h = fh * ppc;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw; ctx.globalAlpha = 0.9;
+    switch (kind) {
+      case 'dotted':
+        ctx.lineCap = 'round'; ctx.lineWidth = lw * 1.3;
+        ctx.setLineDash([0.001, lw * 2.5]);
+        ctx.strokeRect(x, y, w, h);
+        break;
+      case 'dashed':
+        ctx.setLineDash([lw * 3.6, lw * 2.2]);
+        ctx.strokeRect(x, y, w, h);
+        break;
+      case 'solid':
+        ctx.strokeRect(x, y, w, h);
+        break;
+      case 'double': {
+        ctx.lineWidth = lw * 0.7;
+        ctx.strokeRect(x, y, w, h);
+        const dd = lw * 2.1;
+        ctx.strokeRect(x + dd, y + dd, w - dd * 2, h - dd * 2);
+        break;
+      }
+      case 'label':
+        ctx.globalAlpha = 1;
+        roundRectPath(ctx, x, y, w, h, Math.min(w, h) * 0.09);
+        ctx.fill();
+        break;
+    }
+    ctx.restore();
+  }
+
+  function drawLetter(ctx, ch, font, aw, ah, ang, offX, offY, color, ppc) {
+    const awp = aw * ppc, ahp = ah * ppc;
+    if (awp <= 1 || ahp <= 1) return;
+    ctx.font = `${font.style} ${font.weight} 100px ${font.name}`;
+    const m = ctx.measureText(ch);
+    const L = m.actualBoundingBoxLeft || 0;
+    const R = m.actualBoundingBoxRight || m.width || 60;
+    const A = m.actualBoundingBoxAscent || 72;
+    const D = m.actualBoundingBoxDescent || 0;
+    const bw = Math.max(1, L + R), bh = Math.max(1, A + D);
+    const c = Math.abs(Math.cos(ang)), s = Math.abs(Math.sin(ang));
+    const RW = bw * c + bh * s, RH = bw * s + bh * c;
+    const k = Math.min(awp * 0.9 / RW, ahp * 0.86 / RH, ahp * 1.2 / 100);
+    const slackX = Math.max(0, (awp - RW * k) / 2), slackY = Math.max(0, (ahp - RH * k) / 2);
+    ctx.save();
+    ctx.translate(offX * slackX * 0.75, offY * slackY * 0.75);
+    ctx.rotate(ang);
+    ctx.font = `${font.style} ${font.weight} ${(100 * k).toFixed(2)}px ${font.name}`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(ch, -(R - L) / 2 * k, (A - D) / 2 * k);
+    ctx.restore();
+  }
+
+  function drawCard(ctx, tk, W, H, ppc, o) {
+    const st = o.style;
+    const font = SR.FONTS[tk.fontIdx] || SR.FONTS[0];
+    const r = rng32(tk.seed || 1);
+    const mn0 = Math.min(W, H);
+
+    let outer, inner, inset;
+    if (st.torn) {
+      const scale = Math.min(1, mn0 / 6);
+      const amp = (0.07 + 0.2 * st.tornAmt) * Math.max(0.45, scale);
+      const t = makeTear(r, W, H, 0.08 * Math.max(0.5, scale), amp, st.tornAmt);
+      outer = t.outer; inner = t.inner; inset = t.depth + 0.04;
+    } else {
+      outer = inner = [[-W / 2, -H / 2], [W / 2, -H / 2], [W / 2, H / 2], [-W / 2, H / 2]];
+      inset = 0;
+    }
+
+    ctx.save();
+    if (o.shadow) {
+      ctx.shadowColor = 'rgba(0,0,0,0.32)';
+      ctx.shadowBlur = Math.max(2, 0.22 * ppc);
+      ctx.shadowOffsetX = 0.05 * ppc;
+      ctx.shadowOffsetY = 0.1 * ppc;
+    }
+    tracePath(ctx, outer, ppc);
+    ctx.fillStyle = st.torn ? PAPER_CORE : tk.bg;
+    ctx.fill();
+    ctx.restore();
+
+    if (st.torn) {
+      tracePath(ctx, inner, ppc);
+      ctx.fillStyle = tk.bg;
+      ctx.fill();
+    }
+
+    ctx.save();
+    tracePath(ctx, inner, ppc);
+    ctx.clip();
+
+    if (st.halftone) {
+      const tile = halftoneTile(0.14 * ppc);
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = ctx.createPattern(tile, 'repeat');
+      ctx.fillRect(-W / 2 * ppc, -H / 2 * ppc, W * ppc, H * ppc);
+      ctx.globalAlpha = 1;
+    }
+
+    const cw = W - 2 * inset, ch = H - 2 * inset;
+    const mn = Math.min(cw, ch);
+    const frameKind = st.frame === 'mix' ? (tk.frameKind || 'none') : st.frame;
+    const maxDeg = 3 + 11 * st.tiltAmt;
+    const frameAng = (st.tilt && frameKind !== 'none') ? tk.frameRot * maxDeg * 0.3 * DEG : 0;
+    const letterAng = st.tilt ? tk.letterRot * maxDeg * DEG : 0;
+    let textColor = tk.color;
+    let aw, ah;
+
+    ctx.save();
+    if (frameKind === 'none') {
+      aw = cw * 0.92; ah = ch * 0.92;
+    } else {
+      const fi = mn * 0.075;
+      let fw = cw - 2 * fi, fh = ch - 2 * fi;
+      if (frameAng) {
+        const c = Math.abs(Math.cos(frameAng)), s = Math.abs(Math.sin(frameAng));
+        const k = Math.min(fw / (fw * c + fh * s), fh / (fw * s + fh * c));
+        fw *= k; fh *= k;
+      }
+      ctx.rotate(frameAng);
+      const lw = Math.max(1, mn * 0.026 * ppc);
+      drawFrame(ctx, frameKind, fw, fh, lw, tk.color, ppc);
+      if (frameKind === 'label') textColor = tk.bg;
+      const pad = (frameKind === 'label' ? mn * 0.05 : (lw / ppc) * (frameKind === 'double' ? 4 : 2.2) + mn * 0.045);
+      aw = fw - 2 * pad; ah = fh - 2 * pad;
+    }
+    drawLetter(ctx, tk.char, font, aw, ah, letterAng, st.tilt ? tk.offX : 0, st.tilt ? tk.offY : 0, textColor, ppc);
+    ctx.restore();
+    ctx.restore();
+
+    if (st.crumple) {
+      const rc = rng32((tk.seed || 1) ^ 0x5bd1e995);
+      const diag = Math.hypot(W, H);
+      const size = Math.max(14, diag * 1.5) * ppc;
+      const maxOff = (size - diag * ppc) / 2 * 0.8;
+      ctx.save();
+      tracePath(ctx, outer, ppc);
+      ctx.clip();
+      ctx.globalCompositeOperation = 'hard-light';
+      ctx.globalAlpha = 0.2 + 0.7 * st.crumpleAmt;
+      ctx.translate((rc() * 2 - 1) * maxOff, (rc() * 2 - 1) * maxOff);
+      ctx.rotate(rc() * TAU);
+      ctx.drawImage(getCrumple(size), -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+
+    if (st.torn) {
+      ctx.save();
+      tracePath(ctx, outer, ppc);
+      ctx.strokeStyle = 'rgba(0,0,0,0.14)';
+      ctx.lineWidth = Math.max(0.5, 0.012 * ppc);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if (o.guides) {
+      const lw = Math.max(1, 0.03 * ppc);
+      ctx.save();
+      ctx.setLineDash([0.22 * ppc, 0.15 * ppc]);
+      ctx.lineWidth = lw;
+      ctx.strokeStyle = st.torn ? '#94a3b8' : (tk.border || '#94a3b8');
+      ctx.strokeRect(-W / 2 * ppc + lw / 2, -H / 2 * ppc + lw / 2, W * ppc - lw, H * ppc - lw);
+      ctx.restore();
+    }
+
+    if (o.tape) {
+      ctx.save();
+      ctx.rotate((tk.tapeRot || 0) * DEG);
+      const tw = W * 0.55 * ppc, th = Math.min(1.1, H * 0.14) * ppc;
+      const ty = -H / 2 * ppc - th * 0.45;
+      ctx.fillStyle = 'rgba(254,240,138,0.62)';
+      ctx.fillRect(-tw / 2, ty, tw, th);
+      ctx.strokeStyle = 'rgba(202,138,4,0.35)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 2]);
+      ctx.strokeRect(-tw / 2, ty, tw, th);
+      ctx.restore();
+    }
+  }
+
+  SR.rng32 = rng32;
+  SR.drawCard = drawCard;
+  SR.warmCrumple = function () { if (!crumpleBig) buildCrumple(); };
+})();
+
+/* =============================================================================
+   Studio Recorte de Revista — Aplicação (estado, interface, layout, exportação)
+   ========================================================================== */
+(function () {
+  'use strict';
+  const SR = window.SR;
+  const $ = (id) => document.getElementById(id);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  const STORE_KEY = 'studio-recorte-revista:v2';
+  const JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  const A4 = { w: 21, h: 29.7, mx: 1.2, mt: 1.9, mb: 1.6, gap: 0.5 };
+  const PRINT_PPC = 150 / 2.54;
+  const PDF_PPC = 200 / 2.54;
+
+  const PERSIST = Object.keys(SR.DEFAULTS).concat(['tokens']);
+  const state = Object.assign({}, clone(SR.DEFAULTS), {
+    tokens: [],
+    view: 'poster',
+    zoom: 1,
+    refs: [],
+    expanded: false
+  });
+  let rng = SR.rng32(state.seed);
+  let hits = [];
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (saved && typeof saved === 'object') {
+        PERSIST.forEach((k) => { if (k in saved) state[k] = saved[k]; });
+      }
+    } catch (e) { /* ok */ }
+    rng = SR.rng32((state.seed + state.tokens.length * 7919) | 0);
+  }
+  let saveTimer = 0;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try {
+        const out = {};
+        PERSIST.forEach((k) => { out[k] = state[k]; });
+        localStorage.setItem(STORE_KEY, JSON.stringify(out));
+      } catch (e) { /* ok */ }
+    }, 400);
+  }
+
+  function styleOpts() {
+    return {
+      torn: state.torn, tornAmt: state.tornAmt,
+      crumple: state.crumple, crumpleAmt: state.crumpleAmt,
+      halftone: state.halftone, frame: state.frame,
+      tilt: state.tilt, tiltAmt: state.tiltAmt
+    };
+  }
+
+  function fontsForTheme() {
+    const all = SR.FONTS.map((_, i) => i);
+    if (state.theme === 'mixed') return all;
+    const f = all.filter((i) => SR.FONTS[i].category === state.theme);
+    return f.length ? f : all;
+  }
+  function activePalette() {
+    if (state.useExtracted && state.extracted.length) return state.extracted;
+    return SR.PALETTES[state.theme] || SR.PALETTES.mixed;
+  }
+  function pickFrame(R) {
+    const total = SR.FRAME_WEIGHTS.reduce((a, b) => a + b, 0);
+    let x = R() * total;
+    for (let i = 0; i < SR.FRAME_KINDS.length; i++) {
+      x -= SR.FRAME_WEIGHTS[i];
+      if (x <= 0) return SR.FRAME_KINDS[i];
+    }
+    return 'none';
+  }
+  function makeToken(ch, R) {
+    const fonts = fontsForTheme(), pal = activePalette();
+    const p = pal[Math.floor(R() * pal.length)];
+    return {
+      char: ch, space: false,
+      fontIdx: fonts[Math.floor(R() * fonts.length)],
+      bg: p.bg, color: p.text, border: p.border,
+      rot: +(R() * 7 - 3.5).toFixed(2),
+      letterRot: R() * 2 - 1, offX: R() * 2 - 1, offY: R() * 2 - 1,
+      frameRot: R() * 2 - 1, frameKind: pickFrame(R), tapeRot: R() * 8 - 4,
+      seed: Math.floor(R() * 2147483646) + 1
+    };
+  }
+  function upper(ch) { const u = ch.toUpperCase(); return u.length === 1 ? u : ch; }
+
+  function syncTokens(force) {
+    if (force) rng = SR.rng32(state.seed);
+    const chars = Array.from(state.text);
+    const old = force ? [] : state.tokens;
+    state.tokens = chars.map((raw, i) => {
+      if (/\s/.test(raw)) return { space: true, nl: raw === '\n' };
+      const ch = upper(raw);
+      const o = old[i];
+      if (o && !o.space && o.seed) { o.char = ch; return o; }
+      return makeToken(ch, rng);
+    });
+    $('char-count').textContent = `${state.tokens.filter((t) => !t.space).length} letras`;
+  }
+
+  function paragraphs() {
+    const paras = [[]];
+    let word = [];
+    state.tokens.forEach((t, i) => {
+      if (t.space) {
+        if (word.length) { paras[paras.length - 1].push(word); word = []; }
+        if (t.nl) paras.push([]);
+      } else word.push(i);
+    });
+    if (word.length) paras[paras.length - 1].push(word);
+    return paras.filter((p) => p.length);
+  }
+
+  function layoutPoster(W, H, paras) {
+    const PW = state.posterW, PH = state.posterH;
+    const uw = PW * 0.88, uh = PH * 0.88;
+    const lg = W * 0.1, wg = W * 0.42, ng = H * 0.2;
+    const lines = [];
+    let ok = W <= uw && H <= uh;
+    const maxN = Math.max(1, Math.floor((uw + lg) / (W + lg)));
+    const ww = (n) => n * W + (n - 1) * lg;
+    for (const p of paras) {
+      let cur = [], cw = 0;
+      for (const word of p) {
+        const chunks = [];
+        for (let i = 0; i < word.length; i += maxN) chunks.push(word.slice(i, i + maxN));
+        if (chunks.length > 1) ok = false;
+        for (const c of chunks) {
+          const w = ww(c.length);
+          if (cur.length && cw + wg + w > uw) { lines.push({ words: cur, w: cw }); cur = []; cw = 0; }
+          cw += (cur.length ? wg : 0) + w;
+          cur.push(c);
+        }
+      }
+      if (cur.length) lines.push({ words: cur, w: cw });
+    }
+    const totalH = lines.length ? lines.length * H + (lines.length - 1) * ng : 0;
+    if (totalH > uh) ok = false;
+    return { lines, totalH, lg, wg, ng, ok };
+  }
+
+  function letterSize(paras) {
+    if (!state.isAuto) {
+      return { w: clamp(+state.letterW || 7.2, 1.5, 18.6), h: clamp(+state.letterH || 9.5, 1.5, 26.4) };
+    }
+    if (!paras.length) return { w: 7.2, h: 9.5 };
+    let lo = 1.5, hi = Math.min(18.4, 26.2 / 1.32), best = lo;
+    for (let it = 0; it < 24; it++) {
+      const mid = (lo + hi) / 2;
+      if (layoutPoster(mid, mid * 1.32, paras).ok) { best = mid; lo = mid; } else hi = mid;
+    }
+    const w = Math.floor(best * 10) / 10;
+    return { w, h: Math.floor(w * 1.32 * 10) / 10 };
+  }
+
+  function a4Layout(W, H) {
+    const cols = Math.max(1, Math.floor((A4.w - 2 * A4.mx + A4.gap) / (W + A4.gap)));
+    const rows = Math.max(1, Math.floor((A4.h - A4.mt - A4.mb + A4.gap) / (H + A4.gap)));
+    const gridW = cols * W + (cols - 1) * A4.gap;
+    return { cols, rows, per: cols * rows, ox: Math.max(A4.mx * 0.5, (A4.w - gridW) / 2), oy: A4.mt };
+  }
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function fmt(n) { return (Math.round(n * 10) / 10).toFixed(1).replace('.', ','); }
+
+  function sizeCanvas(cv, cssW, cssH) {
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(dpr, 4096 / Math.max(cssW, cssH));
+    const bw = Math.max(1, Math.round(cssW * dpr)), bh = Math.max(1, Math.round(cssH * dpr));
+    if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
+    cv.style.width = cssW + 'px';
+    cv.style.height = cssH + 'px';
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(bw / cssW, 0, 0, bh / cssH, 0, 0);
+    return ctx;
+  }
+
+  let frameReq = 0;
+  function scheduleRender() {
+    if (frameReq) return;
+    frameReq = requestAnimationFrame(() => { frameReq = 0; render(); });
+  }
+
+  let current = null;
+  function compute() {
+    const paras = paragraphs();
+    const sz = letterSize(paras);
+    const lay = layoutPoster(sz.w, sz.h, paras);
+    const letters = state.tokens.filter((t) => !t.space);
+    const al = a4Layout(sz.w, sz.h);
+    const pages = Math.max(1, Math.ceil(letters.length / al.per));
+    return { paras, sz, lay, letters, al, pages };
+  }
+
+  function render() {
+    current = compute();
+    const { sz, lay, letters, pages } = current;
+    const poster = `${state.posterW} × ${state.posterH} cm`;
+    $('st-poster').textContent = poster;
+    $('st-letter').textContent = `${fmt(sz.w)} × ${fmt(sz.h)} cm`;
+    $('st-count').textContent = letters.length;
+    $('st-pages').textContent = pages;
+    $('tab-poster-dim').textContent = `(${state.posterW}×${state.posterH})`;
+    $('tab-a4-count').textContent = `(${pages})`;
+    $('auto-size').textContent = `${fmt(sz.w)} × ${fmt(sz.h)} cm`;
+    $('fit-warning').classList.toggle('hidden', lay.ok || !letters.length);
+    $('zoom-label').textContent = `${Math.round(state.zoom * 100)}%`;
+
+    if (state.view === 'poster') renderPoster();
+    else renderA4Preview();
+  }
+
+  function stageBox() {
+    const st = $('stage');
+    const cs = getComputedStyle(st);
+    const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    return { w: Math.max(120, st.clientWidth - padX - 12), h: Math.max(120, st.clientHeight - padY - 12) };
+  }
+
+  function renderPoster() {
+    const { sz, lay } = current;
+    const PW = state.posterW, PH = state.posterH;
+    const box = stageBox();
+    const fit = Math.min(box.w, box.h * PW / PH);
+    const cssW = Math.round(Math.max(160, fit) * state.zoom);
+    const cssH = Math.round(cssW * PH / PW);
+    const cv = $('poster-canvas');
+    const ctx = sizeCanvas(cv, cssW, cssH);
+    const ppc = cssW / PW;
+
+    ctx.fillStyle = state.posterColor;
+    ctx.fillRect(0, 0, cssW, cssH);
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 5; x < PW; x += 5) { ctx.moveTo(x * ppc, 0); ctx.lineTo(x * ppc, cssH); }
+    for (let y = 5; y < PH; y += 5) { ctx.moveTo(0, y * ppc); ctx.lineTo(cssW, y * ppc); }
+    ctx.stroke();
+
+    const opts = { style: styleOpts(), shadow: true, tape: state.tape, guides: state.guides && !state.torn };
+    const W = sz.w, H = sz.h;
+    hits = [];
+    let y = (PH - lay.totalH) / 2;
+    for (const line of lay.lines) {
+      let x = (PW - line.w) / 2;
+      for (const word of line.words) {
+        word.forEach((ti, j) => {
+          const t = state.tokens[ti];
+          ctx.save();
+          ctx.translate((x + W / 2) * ppc, (y + H / 2) * ppc);
+          if (state.rotation) ctx.rotate(t.rot * Math.PI / 180);
+          SR.drawCard(ctx, t, W, H, ppc, opts);
+          ctx.restore();
+          hits.push({ i: ti, x, y, w: W, h: H });
+          x += W + (j < word.length - 1 ? lay.lg : 0);
+        });
+        x += lay.wg;
+      }
+      y += H + lay.ng;
+    }
+
+    if (!current.letters.length) {
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.font = `600 ${Math.max(12, ppc * 2.5)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Digite uma frase para começar ✂', cssW / 2, cssH / 2);
+    }
+  }
+
+  function drawA4Page(ctx, ppc, p) {
+    const { sz, letters, al, pages } = current;
+    const W = sz.w, H = sz.h;
+    const pw = A4.w * ppc, ph = A4.h * ppc;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, pw, ph);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = `600 ${0.27 * ppc}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+    ctx.fillText(`STUDIO RECORTE DE REVISTA  •  Letra ${fmt(W)} × ${fmt(H)} cm  •  Cartolina ${state.posterW} × ${state.posterH} cm`, A4.mx * ppc, 1.05 * ppc);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(`Folha ${p + 1} de ${pages}`, (A4.w - A4.mx) * ppc, 1.05 * ppc);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = Math.max(1, 0.02 * ppc);
+    ctx.beginPath(); ctx.moveTo(A4.mx * ppc, 1.35 * ppc); ctx.lineTo((A4.w - A4.mx) * ppc, 1.35 * ppc); ctx.stroke();
+
+    const opts = { style: styleOpts(), shadow: false, tape: false, guides: state.guides };
+    const start = p * al.per, end = Math.min(letters.length, start + al.per);
+    for (let i = start; i < end; i++) {
+      const k = i - start, c = k % al.cols, r = Math.floor(k / al.cols);
+      const x = al.ox + c * (W + A4.gap), y = al.oy + r * (H + A4.gap);
+      ctx.save();
+      ctx.translate((x + W / 2) * ppc, (y + H / 2) * ppc);
+      SR.drawCard(ctx, letters[i], W, H, ppc, opts);
+      ctx.restore();
+    }
+
+    ctx.beginPath(); ctx.moveTo(A4.mx * ppc, (A4.h - 1.1) * ppc); ctx.lineTo((A4.w - A4.mx) * ppc, (A4.h - 1.1) * ppc); ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = `500 ${0.24 * ppc}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.fillText('✂ Recorte nas linhas tracejadas', A4.mx * ppc, (A4.h - 0.65) * ppc);
+    ctx.textAlign = 'right';
+    ctx.fillText('Imprima em escala 100% (tamanho real, sem "ajustar à página")', (A4.w - A4.mx) * ppc, (A4.h - 0.65) * ppc);
+  }
+
+  function renderA4Preview() {
+    const host = $('a4-pages');
+    const { pages } = current;
+    while (host.children.length > pages) host.lastChild.remove();
+    while (host.children.length < pages) host.appendChild(document.createElement('canvas'));
+    const box = stageBox();
+    const cssW = Math.round(Math.min(794, box.w) * state.zoom);
+    const cssH = Math.round(cssW * A4.h / A4.w);
+    const ppc = cssW / A4.w;
+    Array.from(host.children).forEach((cv, p) => {
+      const ctx = sizeCanvas(cv, cssW, cssH);
+      drawA4Page(ctx, ppc, p);
+    });
+  }
+
+  function pageCanvas(ppc) {
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(A4.w * ppc);
+    cv.height = Math.round(A4.h * ppc);
+    return cv;
+  }
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  function toBlob(cv, type, q) { return new Promise((r) => cv.toBlob(r, type, q)); }
+
+  async function doPrint() {
+    const btn = $('btn-print');
+    btn.disabled = true;
+    try {
+      await fontsReady;
+      current = compute();
+      const area = $('print-area');
+      area.querySelectorAll('img').forEach((im) => URL.revokeObjectURL(im.src));
+      area.innerHTML = '';
+      const cv = pageCanvas(PRINT_PPC), ctx = cv.getContext('2d');
+      const imgs = [];
+      for (let p = 0; p < current.pages; p++) {
+        toast(`Preparando folha ${p + 1} de ${current.pages}…`);
+        drawA4Page(ctx, PRINT_PPC, p);
+        const blob = await toBlob(cv, 'image/jpeg', 0.92);
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+        area.appendChild(img);
+        imgs.push(img);
+        await tick();
+      }
+      await Promise.all(imgs.map((im) => (im.decode ? im.decode().catch(() => {}) : Promise.resolve())));
+      toast('Abrindo impressão… use escala 100%');
+      window.print();
+    } catch (e) {
+      console.error(e);
+      toast('Não foi possível preparar a impressão.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function exportPdf() {
+    const btn = $('btn-pdf');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="lbl">Gerando…</span>';
+    try {
+      if (!window.jspdf) {
+        try { await loadScript(JSPDF_URL); } catch (e) {
+          toast('Sem internet para gerar o PDF. Use "Imprimir" → "Salvar como PDF".');
+          return;
+        }
+      }
+      await fontsReady;
+      current = compute();
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+      const cv = pageCanvas(PDF_PPC), ctx = cv.getContext('2d');
+      for (let p = 0; p < current.pages; p++) {
+        btn.innerHTML = `<span class="lbl">Folha ${p + 1}/${current.pages}</span>`;
+        await tick();
+        drawA4Page(ctx, PDF_PPC, p);
+        if (p > 0) pdf.addPage('a4', 'portrait');
+        pdf.addImage(cv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+      }
+      pdf.save(`Letras_Revista_${state.posterW}x${state.posterH}cm.pdf`);
+      toast('PDF gerado! Imprima em escala 100%.');
+    } catch (e) {
+      console.error('Erro na geração do PDF:', e);
+      toast('Erro ao gerar o PDF. Tente "Imprimir" → "Salvar como PDF".');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  }
+
+  function loadImage(src) {
+    return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+  }
+  async function shrinkFile(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const im = await loadImage(url);
+      const k = Math.min(1, 200 / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.85);
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  async function onRefUpload(e) {
+    const files = Array.from(e.target.files || []).slice(0, 10 - state.refs.length);
+    e.target.value = '';
+    if (!files.length) { if (state.refs.length >= 10) toast('Limite de 10 imagens.'); return; }
+    for (const f of files) {
+      try { state.refs.push(await shrinkFile(f)); } catch (err) { console.warn('Imagem ignorada', err); }
+    }
+    renderRefs();
+    await extractPalette();
+  }
+
+  function renderRefs() {
+    $('ref-count').textContent = `${state.refs.length}/10`;
+    const grid = $('ref-grid');
+    grid.innerHTML = '';
+    state.refs.forEach((src, i) => {
+      const d = document.createElement('div');
+      d.className = 'ref-thumb';
+      d.innerHTML = `<img src="${src}" alt="Referência ${i + 1}"><button data-i="${i}" title="Remover" aria-label="Remover">✕</button>`;
+      grid.appendChild(d);
+    });
+  }
+
+  async function extractPalette() {
+    if (!state.refs.length) return;
+    const buckets = new Map();
+    const c = document.createElement('canvas');
+    c.width = c.height = 48;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    for (const src of state.refs) {
+      const im = await loadImage(src);
+      g.clearRect(0, 0, 48, 48);
+      g.drawImage(im, 0, 0, 48, 48);
+      const d = g.getImageData(0, 0, 48, 48).data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], gg = d[i + 1], b = d[i + 2];
+        const br = (r * 299 + gg * 587 + b * 114) / 1000;
+        if (br < 26 || br > 240) continue;
+        const key = ((r >> 4) << 8) | ((gg >> 4) << 4) | (b >> 4);
+        const v = buckets.get(key) || { n: 0, r: 0, g: 0, b: 0 };
+        v.n++; v.r += r; v.g += gg; v.b += b;
+        buckets.set(key, v);
+      }
+    }
+    const sorted = Array.from(buckets.values()).sort((a, b) => b.n - a.n)
+      .map((v) => [Math.round(v.r / v.n), Math.round(v.g / v.n), Math.round(v.b / v.n)]);
+    const picked = [];
+    for (const col of sorted) {
+      if (picked.every((p) => Math.hypot(p[0] - col[0], p[1] - col[1], p[2] - col[2]) > 48)) picked.push(col);
+      if (picked.length >= 10) break;
+    }
+    if (!picked.length) { toast('Não encontrei cores marcantes nessas imagens.'); return; }
+    state.extracted = picked.map(([r, g2, b]) => {
+      const hex = '#' + ((1 << 24) + (r << 16) + (g2 << 8) + b).toString(16).slice(1);
+      const lum = 0.2126 * r + 0.7152 * g2 + 0.0722 * b;
+      return { bg: hex, text: lum > 140 ? '#09090b' : '#ffffff', border: lum > 140 ? '#475569' : '#e2e8f0' };
+    });
+    renderPalette();
+    save();
+  }
+
+  function renderPalette() {
+    const box = $('palette-box');
+    box.classList.toggle('hidden', !state.extracted.length);
+    $('swatches').innerHTML = state.extracted.map((c) => `<i style="background:${c.bg}" title="${c.bg}"></i>`).join('');
+    $('btn-apply-palette').textContent = state.useExtracted ? '✓ Aplicado nos recortes' : 'Aplicar nos recortes';
+  }
+
+  function setActive(sel, attr, value) {
+    $$(sel).forEach((b) => b.classList.toggle('active', String(b.dataset[attr]) === String(value)));
+  }
+
+  function syncControls() {
+    $('txt').value = state.text;
+    setActive('.theme-btn', 'theme', state.theme);
+    setActive('.frame-btn', 'frame', state.frame);
+    $$('.poster-btn').forEach((b) => b.classList.toggle('active', +b.dataset.w === +state.posterW && +b.dataset.h === +state.posterH));
+    $('in-poster-w').value = state.posterW;
+    $('in-poster-h').value = state.posterH;
+    $('in-poster-color').value = state.posterColor;
+    $('in-letter-w').value = state.letterW;
+    $('in-letter-h').value = state.letterH;
+    $('mode-auto').classList.toggle('active', state.isAuto);
+    $('mode-manual').classList.toggle('active', !state.isAuto);
+    $('auto-box').classList.toggle('hidden', !state.isAuto);
+    $('manual-box').classList.toggle('hidden', state.isAuto);
+    [['opt-tilt', 'tilt'], ['opt-crumple', 'crumple'], ['opt-torn', 'torn'], ['opt-halftone', 'halftone'],
+     ['opt-rotation', 'rotation'], ['opt-tape', 'tape'], ['opt-guides', 'guides']].forEach(([id, k]) => { $(id).checked = !!state[k]; });
+    [['opt-tilt-amt', 'tiltAmt'], ['opt-crumple-amt', 'crumpleAmt'], ['opt-torn-amt', 'tornAmt']].forEach(([id, k]) => { $(id).value = Math.round(state[k] * 100); });
+    $$('.range').forEach((r) => r.classList.toggle('hidden', !$(r.dataset.for).checked));
+    $$('.look-btn').forEach((b) => b.classList.remove('active'));
+    renderPalette();
+  }
+
+  function changed(opts = {}) {
+    if (opts.restyle) syncTokens(true);
+    save();
+    scheduleRender();
+  }
+
+  function switchView(v) {
+    state.view = v;
+    $('tab-poster').classList.toggle('active', v === 'poster');
+    $('tab-a4').classList.toggle('active', v === 'a4');
+    $('poster-wrap').classList.toggle('hidden', v !== 'poster');
+    $('a4-wrap').classList.toggle('hidden', v !== 'a4');
+    $('stage').scrollTop = 0;
+    scheduleRender();
+  }
+
+  let toastTimer = 0;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  function reroll() {
+    state.seed = Math.floor(Math.random() * 2147483646) + 1;
+    changed({ restyle: true });
+  }
+
+  function bind() {
+    let typeTimer = 0;
+    $('txt').addEventListener('input', (e) => {
+      state.text = e.target.value;
+      clearTimeout(typeTimer);
+      typeTimer = setTimeout(() => { syncTokens(false); changed(); }, 90);
+    });
+    const chips = $('phrase-chips');
+    SR.PHRASES.forEach((p) => {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.textContent = p;
+      b.addEventListener('click', () => { state.text = p; $('txt').value = p; syncTokens(false); changed(); });
+      chips.appendChild(b);
+    });
+
+    $$('.theme-btn').forEach((b) => b.addEventListener('click', () => {
+      state.theme = b.dataset.theme;
+      setActive('.theme-btn', 'theme', state.theme);
+      changed({ restyle: true });
+    }));
+    $('btn-reroll').addEventListener('click', reroll);
+    $('btn-reroll-2').addEventListener('click', reroll);
+
+    $$('.look-btn').forEach((b) => b.addEventListener('click', () => {
+      Object.assign(state, SR.LOOKS[b.dataset.look]);
+      syncControls();
+      b.classList.add('active');
+      changed();
+    }));
+
+    $$('.frame-btn').forEach((b) => b.addEventListener('click', () => {
+      state.frame = b.dataset.frame;
+      setActive('.frame-btn', 'frame', state.frame);
+      changed();
+    }));
+
+    [['opt-tilt', 'tilt'], ['opt-crumple', 'crumple'], ['opt-torn', 'torn'], ['opt-halftone', 'halftone'],
+     ['opt-rotation', 'rotation'], ['opt-tape', 'tape'], ['opt-guides', 'guides']].forEach(([id, k]) => {
+      $(id).addEventListener('change', (e) => {
+        state[k] = e.target.checked;
+        $$(`.range[data-for="${id}"]`).forEach((r) => r.classList.toggle('hidden', !e.target.checked));
+        changed();
+      });
+    });
+    [['opt-tilt-amt', 'tiltAmt'], ['opt-crumple-amt', 'crumpleAmt'], ['opt-torn-amt', 'tornAmt']].forEach(([id, k]) => {
+      $(id).addEventListener('input', (e) => { state[k] = (+e.target.value) / 100; changed(); });
+    });
+
+    $$('.poster-btn').forEach((b) => b.addEventListener('click', () => {
+      state.posterW = +b.dataset.w; state.posterH = +b.dataset.h;
+      syncControls(); changed();
+    }));
+    const numInput = (id, k, min, max) => $(id).addEventListener('input', (e) => {
+      const v = parseFloat(String(e.target.value).replace(',', '.'));
+      if (!isFinite(v)) return;
+      state[k] = clamp(v, min, max);
+      if (k === 'posterW' || k === 'posterH') {
+        $$('.poster-btn').forEach((b) => b.classList.toggle('active', +b.dataset.w === +state.posterW && +b.dataset.h === +state.posterH));
+      }
+      changed();
+    });
+    numInput('in-poster-w', 'posterW', 15, 600);
+    numInput('in-poster-h', 'posterH', 15, 600);
+    numInput('in-letter-w', 'letterW', 1.5, 18.6);
+    numInput('in-letter-h', 'letterH', 1.5, 26.4);
+    $('in-poster-color').addEventListener('input', (e) => { state.posterColor = e.target.value; changed(); });
+    $('mode-auto').addEventListener('click', () => { state.isAuto = true; syncControls(); changed(); });
+    $('mode-manual').addEventListener('click', () => {
+      if (state.isAuto && current) { state.letterW = current.sz.w; state.letterH = current.sz.h; }
+      state.isAuto = false; syncControls(); changed();
+    });
+
+    $('ref-input').addEventListener('change', onRefUpload);
+    $('ref-grid').addEventListener('click', async (e) => {
+      const b = e.target.closest('button[data-i]');
+      if (!b) return;
+      state.refs.splice(+b.dataset.i, 1);
+      renderRefs();
+      if (state.refs.length) await extractPalette();
+    });
+    $('btn-apply-palette').addEventListener('click', () => {
+      if (!state.extracted.length) return;
+      state.useExtracted = true; renderPalette(); changed({ restyle: true });
+    });
+    $('btn-clear-palette').addEventListener('click', () => {
+      state.useExtracted = false; renderPalette(); changed({ restyle: true });
+    });
+
+    $('btn-reset').addEventListener('click', () => {
+      if (!confirm('Restaurar todas as configurações para o padrão?')) return;
+      Object.assign(state, clone(SR.DEFAULTS));
+      state.refs = []; renderRefs();
+      syncControls(); changed({ restyle: true });
+      toast('Configurações restauradas.');
+    });
+
+    $('tab-poster').addEventListener('click', () => switchView('poster'));
+    $('tab-a4').addEventListener('click', () => switchView('a4'));
+    $('zoom-in').addEventListener('click', () => { state.zoom = clamp(+(state.zoom + 0.25).toFixed(2), 0.5, 4); scheduleRender(); });
+    $('zoom-out').addEventListener('click', () => { state.zoom = clamp(+(state.zoom - 0.25).toFixed(2), 0.5, 4); scheduleRender(); });
+    $('zoom-fit').addEventListener('click', () => { state.zoom = 1; scheduleRender(); });
+    $('btn-expand').addEventListener('click', () => {
+      state.expanded = !state.expanded;
+      $('app').classList.toggle('expanded', state.expanded);
+      $('btn-expand').textContent = state.expanded ? '⤡' : '⤢';
+    });
+
+    $('poster-canvas').addEventListener('click', (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const ppc = rect.width / state.posterW;
+      const x = (e.clientX - rect.left) / ppc, y = (e.clientY - rect.top) / ppc;
+      const h = hits.find((r) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+      if (!h) return;
+      const t = state.tokens[h.i];
+      state.tokens[h.i] = makeToken(t.char, SR.rng32((Math.random() * 2147483646) | 0));
+      changed();
+    });
+
+    $('btn-print').addEventListener('click', doPrint);
+    $('btn-pdf').addEventListener('click', exportPdf);
+
+    if (window.ResizeObserver) new ResizeObserver(() => scheduleRender()).observe($('stage'));
+    else window.addEventListener('resize', scheduleRender);
+  }
+
+  const fontsReady = (async () => {
+    if (!document.fonts || !document.fonts.load) return;
+    const sample = 'AÉÇÃ';
+    await Promise.race([
+      Promise.all(SR.FONTS.map((f) => document.fonts.load(`${f.style} ${f.weight} 40px ${f.name}`, sample).catch(() => null))),
+      new Promise((r) => setTimeout(r, 5000))
+    ]);
+  })();
+
+  function init() {
+    load();
+    if (!state.tokens.length || state.tokens.length !== Array.from(state.text).length) syncTokens(!state.tokens.length);
+    else $('char-count').textContent = `${state.tokens.filter((t) => !t.space).length} letras`;
+    syncControls();
+    bind();
+    if (location.hash === '#a4') switchView('a4');
+    render();
+    fontsReady.then(() => scheduleRender());
+    if (document.fonts && document.fonts.addEventListener) {
+      document.fonts.addEventListener('loadingdone', () => scheduleRender());
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>
